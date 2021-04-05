@@ -145,6 +145,7 @@ public class App {
                 System.out.println("\n-->Account not found. Try another name");
                 sleep(2000);
                 load(scan);
+                sleep(2000);
             }
         
     }
