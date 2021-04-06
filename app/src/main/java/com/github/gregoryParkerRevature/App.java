@@ -3,19 +3,17 @@
  */
 package com.github.gregoryParkerRevature;
 
-import java.io.BufferedReader;
 import java.io.*;
-import java.util.Scanner;
 import java.util.*;
 import java.io.File;
 
 public class App {
     
     public String username;
+    
 
     public static void main(String[] args) {
-    
-        //load users arraylist before everything 
+
         App app = new App();
         app.diagnostic();
         
@@ -58,7 +56,7 @@ public class App {
         User user = new User();
         Accounts account = user.getAccountRef(user.getUserName());
         System.out.printf("User: %s       Total Capital: %.2f\n", user.getUserName(), account.getNetWorth());
-        System.out.println("1: List Accounts \n2: Add Account \n3: Remove Account \n4: Save \n5: Exit");
+        System.out.println("1: List Accounts \n2: Add Account \n3: Remove Account \n4: Save \n5: write \n6: read \n7: Exit");
         System.out.print("Input: ");
         int response = scan.nextInt();
 
@@ -91,8 +89,16 @@ public class App {
                 }catch (IOException e){
                     System.out.println();
                 }
-
+            
             case 5: 
+                account.writeToSQL();
+                userInterface(scan);
+
+            case 6:
+                account.readFromSQL();
+                userInterface(scan);
+
+            case 7: 
                 System.exit(0);
                 break;
 
@@ -111,16 +117,30 @@ public class App {
 
         System.out.print("Hello! Please enter new username: ");
         String userInput = scan.next();
+        String fileName = "/Users/gregparker/Desktop/userData/";
+        try{
+            File file = new File(fileName + userInput + ".txt");
+            if(file.createNewFile()){
+                System.out.println();
+                Accounts account = new Accounts();
+                User newUser = new User();
+                newUser.user(userInput, account);
 
-        //add line to check current users from file/database no overlap!!!
+                System.out.printf("\nWelcome %s!\n", newUser.getUserName());
+                sleep(2000);
+                userInterface(scan);
+            }
+            else{
+                System.out.println("\nUser alrady exists. Try another name\n");
+                sleep(2000);
+                newUser(scan);
+            }
+        }catch (IOException e){
+            System.out.println();
+        }
+    }
+
         
-        Accounts account = new Accounts();
-        User newUser = new User();
-        newUser.user(userInput, account);
-
-        System.out.printf("\nWelcome %s!\n", newUser.getUserName());
-        sleep(2000);
- }
 
     public void load(Scanner scan){
 

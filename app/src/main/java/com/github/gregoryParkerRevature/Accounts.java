@@ -1,9 +1,15 @@
 package com.github.gregoryParkerRevature;
 
-import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
+import java.sql.Statement;
+
 
 //import jdk.internal.org.jline.reader.UserInterruptException;
 
@@ -40,26 +46,26 @@ public class Accounts{
 
     public void loadUserData(Scanner scan){
 
-        App app = new App();
-        System.out.println("\n\nYou have the following accouts: \n");
-        app.sleep(1000);
+            App app = new App();
 
-        while(scan.hasNextLine()){
-
-            String line = scan.nextLine();
-            System.out.println(line);
-            Scanner lineScanner = new Scanner(line);
-
-            while(lineScanner.hasNext()){
-                accountName = lineScanner.next();
-                balance = lineScanner.nextDouble();
-                app.sleep(2000);
-                accounts.put(accountName, balance);
+            if(scan.hasNextLine()){
+                System.out.println("\n\nYou have the following accouts: \n");
+                app.sleep(1000);
             }
-        }
-        //accounts(accountName, balance);
 
-        
+            while(scan.hasNextLine()){
+
+                String line = scan.nextLine();
+                System.out.println(line);
+                Scanner lineScanner = new Scanner(line);
+
+                while(lineScanner.hasNext()){
+                    accountName = lineScanner.next();
+                    balance = lineScanner.nextDouble();
+                    app.sleep(2000);
+                    accounts.put(accountName, balance);
+                }
+            }
     }
 
     public void writeData(String filename, Scanner scan) throws IOException{
@@ -150,6 +156,62 @@ public class Accounts{
 
      public boolean containsAcct(String key){
          return accounts.containsKey(key);
+     }
+
+     //database stuff
+
+     public Connection getSQLConnection(){
+
+        String url = "jdbc:postgresql://localhost:5432/postgres";
+        String userSQL = "postgres";
+        String password = "password";
+        Connection connection = null;
+        try{
+            connection = DriverManager.getConnection(url, userSQL, password);
+            return connection;
+
+        }catch (SQLException e){
+            System.out.println("didnt work");
+        }
+        return connection;
+     }
+
+     public void writeToSQL(){
+        try{
+            PreparedStatement statement = getSQLConnection().prepareStatement("delete from accounts");
+            statement.execute();
+            statement = getSQLConnection().prepareStatement("insert into accounts(accountName, balance) values (?,?);");
+            for(String name: accounts.keySet()){
+                String key = name.toString();
+                Double value = accounts.get(name);
+                statement.setString(1, key);
+                statement.setDouble(2, value);
+                statement.execute();
+            }
+         }catch (SQLException e){
+            System.out.println("it all went wrong");
+            new App().sleep(5000);
+         }
+    }
+
+     public void readFromSQL(){
+        App app = new App();
+        app.clearScreen();
+        try{
+        Statement statement = getSQLConnection().createStatement();
+        ResultSet resultset = statement.executeQuery("select * from accounts");
+        System.out.println("-->Loading from database");
+        app.sleep(2000);
+        while(resultset.next()){   
+            String acctName = resultset.getString("accountName");
+            Double balance = resultset.getDouble("balance");
+            System.out.printf("\n Your '%s' account has %.2f dollars\n", acctName, balance);
+            app.sleep(2000);
+            
+        }
+        }catch (SQLException e){
+
+        }
      }
        
 
