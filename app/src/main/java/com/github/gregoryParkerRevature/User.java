@@ -32,7 +32,7 @@ public class User{
     public void addAccount(Scanner scan){
 
         //define objects
-        System.out.println();
+        scan = new Scanner(System.in);
         Accounts account = new Accounts();
         account = users.get(username);
         App app = new App();

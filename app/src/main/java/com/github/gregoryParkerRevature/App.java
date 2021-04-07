@@ -5,6 +5,8 @@ package com.github.gregoryParkerRevature;
 
 import java.io.*;
 import java.util.*;
+
+
 import java.io.File;
 
 public class App {
@@ -14,17 +16,29 @@ public class App {
 
     public static void main(String[] args) {
 
-        App app = new App();
-        app.diagnostic();
+        new App().runner();
+        
+        
         
     }
 
+    public void runner(){
+        App app = new App();
+        Scanner scan = new Scanner(System.in);
+        try{
+            app.diagnostic(scan);
+        }catch (InputMismatchException e){
+            app.errorInput();
+            scan = new Scanner(System.in);
+            runner();
+        }
+    }
 
-    public void diagnostic(){
+
+    public void diagnostic(Scanner scan){
 
         
         clearScreen();
-        Scanner scan = new Scanner(System.in);
         
         System.out.print("1: New User\n2: Load User\nInput: ");
 
@@ -40,7 +54,7 @@ public class App {
             load(scan);
         }else{
             errorInput();
-            diagnostic();
+            diagnostic(scan);
         }
 
         //return from newUser method
@@ -50,13 +64,13 @@ public class App {
         
     }//end diagnostic
 
-    public void userInterface(Scanner scan){
+    public void userInterface(Scanner scan) throws InputMismatchException{
 
         clearScreen();
         User user = new User();
         Accounts account = user.getAccountRef(user.getUserName());
         System.out.printf("User: %s       Total Capital: %.2f\n", user.getUserName(), account.getNetWorth());
-        System.out.println("1: List Accounts \n2: Add Account \n3: Remove Account \n4: Save \n5: write \n6: read \n7: Exit");
+        System.out.println("\n1: List Accounts \n2: Add Account \n3: Remove Account \n4: Save \n5: Database \n6: Exit");
         System.out.print("Input: ");
         int response = scan.nextInt();
 
@@ -91,14 +105,12 @@ public class App {
                 }
             
             case 5: 
-                account.writeToSQL();
+
+                databaseManagment(scan);
                 userInterface(scan);
 
             case 6:
-                account.readFromSQL();
-                userInterface(scan);
 
-            case 7: 
                 System.exit(0);
                 break;
 
@@ -107,9 +119,32 @@ public class App {
                 userInterface(scan);
 
         }
-        
+    }
+
+    public void databaseManagment(Scanner scan){
+
+        clearScreen();
+        User user = new User();
+        Accounts account = user.getAccountRef(user.getUserName());;
+        System.out.print("1: Save to Database \n2: Load from Database \nInput: ");
+        int response = scan.nextInt();
+        switch (response){
+            case 1:
+                account.writeToSQL();
+                userInterface(scan);
+            case 2:
+                account.readFromSQL();
+                scan.next();
+                userInterface(scan);
+            default: 
+                errorInput();
+                userInterface(scan);
+        }
+
 
     }
+
+
 
     public void newUser(Scanner scan){
 

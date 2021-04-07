@@ -49,7 +49,7 @@ public class Accounts{
             App app = new App();
 
             if(scan.hasNextLine()){
-                System.out.println("\n\nYou have the following accouts: \n");
+                System.out.println("\n\nYou have the following accounts: \n");
                 app.sleep(1000);
             }
 
@@ -97,6 +97,10 @@ public class Accounts{
 
     public void format(){
         Double netWorth = 0.0;
+        if(accounts.size()<1){
+            System.out.println("You currently do not have any accounts");
+            new App().sleep(2000);
+        }else{
         for(String name: accounts.keySet()){
             String key = name.toString();
             Double value = accounts.get(name);
@@ -104,6 +108,7 @@ public class Accounts{
             System.out.printf("%s:  $%.2f\n", key, value);
         }
         System.out.printf("\nTotal Capital: %.2f", netWorth);
+    }
     }
 
     public Double getNetWorth(){
@@ -178,6 +183,8 @@ public class Accounts{
 
      public void writeToSQL(){
         try{
+            System.out.println("\n-->Saving");
+            new App().sleep(2000);
             PreparedStatement statement = getSQLConnection().prepareStatement("delete from accounts");
             statement.execute();
             statement = getSQLConnection().prepareStatement("insert into accounts(accountName, balance) values (?,?);");
@@ -208,10 +215,12 @@ public class Accounts{
             System.out.printf("\n Your '%s' account has %.2f dollars\n", acctName, balance);
             app.sleep(2000);
             
+            
         }
         }catch (SQLException e){
 
         }
+        System.out.print("\nPress 1 to return: ");
      }
        
 
