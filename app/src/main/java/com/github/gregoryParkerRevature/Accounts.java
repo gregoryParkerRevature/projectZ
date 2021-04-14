@@ -214,8 +214,6 @@ public class Accounts{
             Double balance = resultset.getDouble("balance");
             System.out.printf("\n Your '%s' account has %.2f dollars\n", acctName, balance);
             app.sleep(2000);
-            
-            
         }
         }catch (SQLException e){
 
